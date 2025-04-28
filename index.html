@@ -200,7 +200,7 @@
             if (departure.deviations && departure.deviations.length > 0) {
               const deviationElement = document.createElement('div');
               deviationElement.className = 'deviation';
-              deviationElement.textContent = departure.deviations.join(', ');
+              deviationElement.textContent = departure.deviations[0].message;
               departureElement.appendChild(deviationElement);
             }
 
