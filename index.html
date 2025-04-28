@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SL Departures</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #212121;
+      color: #fff;
+    }
+    .container {
+      padding: 1rem;
+      max-width: 500px;
+      margin: 0 auto;
+    }
+    .header {
+      text-align: center;
+      font-size: 2rem;
+      font-weight: bold;
+      margin-bottom: 1.5rem;
+      padding: 0.5rem;
+      background-color: #c60c30;
+      border-radius: 5px;
+      color: white;
+      cursor: pointer; /* Added cursor pointer to indicate clickability */
+      user-select: none; /* Prevent text selection on click */
+      transition: background-color 0.2s; /* Add smooth transition for hover effect */
+    }
+    .header:hover {
+      background-color: #a00925; /* Same hover color as the refresh button */
+    }
+    .direction-group {
+      margin-bottom: 1.5rem;
+      background-color: #333;
+      border-radius: 5px;
+      padding: 0.5rem;
+    }
+    .direction-header {
+      font-size: 1.4rem;
+      padding: 0.5rem;
+      background-color: #444;
+      margin-bottom: 0.5rem;
+      border-radius: 3px;
+    }
+    .departure {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.8rem 0.5rem;
+      margin-bottom: 0.5rem;
+      border-radius: 3px;
+      background-color: #222;
+      border-left: 4px solid #c60c30;
+    }
+    .destination {
+      font-size: 1.2rem;
+      font-weight: bold;
+    }
+    .time {
+      font-size: 1.4rem;
+      font-weight: bold;
+      color: #ffcc00;
+      background-color: #333;
+      padding: 0.3rem 0.6rem;
+      border-radius: 3px;
+    }
+    .non-normal-state {
+      color: #ff6b6b;
+      font-weight: bold;
+    }
+    .deviation {
+      color: #ff6b6b;
+      font-size: 0.9rem;
+      margin-top: 0.3rem;
+      font-style: italic;
+    }
+    .refresh-button {
+      display: block;
+      margin: 1rem auto;
+      padding: 0.7rem 1.5rem;
+      background-color: #c60c30;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+    .refresh-button:hover {
+      background-color: #a00925;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div id="header" class="header">Loading...</div>
+    <div id="departures"></div>
+    <button id="refresh" class="refresh-button">Refresh</button>
+  </div>
+
+  <script type="module">
+    class SLDepartures {
+      constructor(apiUrl) {
+        this._apiUrl = apiUrl;
+        this._stopPointName = '';
+        this._initRefreshButtons();
+      }
+
+      _initRefreshButtons() {
+        // Initialize both header and refresh button to trigger data refresh
+        const refreshButton = document.getElementById('refresh');
+        const headerElement = document.getElementById('header');
+        
+        // Add click event to both elements
+        [refreshButton, headerElement].forEach(element => {
+          element.addEventListener('click', () => {
+            this.fetchDepartures();
+          });
+        });
+      }
+
+      async fetchDepartures() {
+        try {
+          document.getElementById('header').textContent = 'Loading...';
+          const response = await fetch(this._apiUrl);
+          const data = await response.json();
+
+          this._stopPointName = data.departures[0]?.stop_area?.name || 'Unknown Stop';
+          this.renderHeader();
+
+          const groupedDepartures = this.groupByDirectionCode(data.departures);
+          this.renderDepartures(groupedDepartures);
+        } catch (error) {
+          console.error('Error fetching departures:', error);
+          document.getElementById('header').textContent = 'Error loading data';
+        }
+      }
+
+      groupByDirectionCode(departures) {
+        return departures.reduce((groups, departure) => {
+          const directionCode = departure.direction_code;
+          if (!groups[directionCode]) {
+            groups[directionCode] = [];
+          }
+          groups[directionCode].push(departure);
+          return groups;
+        }, {});
+      }
+
+      renderHeader() {
+        const headerElement = document.getElementById('header');
+        headerElement.textContent = this._stopPointName;
+      }
+
+      renderDepartures(groupedDepartures) {
+        const departuresContainer = document.getElementById('departures');
+        departuresContainer.innerHTML = '';
+
+        for (const [directionCode, departures] of Object.entries(groupedDepartures)) {
+          const directionGroup = document.createElement('div');
+          directionGroup.className = 'direction-group';
+
+          // Get the direction name from the first departure
+          const directionName = departures[0]?.direction || `Direction ${directionCode}`;
+          
+          const directionHeader = document.createElement('div');
+          directionHeader.className = 'direction-header';
+          directionHeader.textContent = directionName;
+          directionGroup.appendChild(directionHeader);
+
+          departures.forEach((departure) => {
+            const departureElement = document.createElement('div');
+            departureElement.className = 'departure';
+
+            // Create destination element
+            const destinationElement = document.createElement('div');
+            destinationElement.className = 'destination';
+            destinationElement.textContent = departure.destination;
+            
+            // Add state information if not "EXPECTED"
+            if (departure.state && departure.state !== "EXPECTED") {
+              const stateElement = document.createElement('span');
+              stateElement.className = 'non-normal-state';
+              stateElement.textContent = ` (${departure.state})`;
+              destinationElement.appendChild(stateElement);
+            }
+            
+            departureElement.appendChild(destinationElement);
+
+            // Create time element
+            const timeElement = document.createElement('div');
+            timeElement.className = 'time';
+            timeElement.textContent = departure.display;
+            departureElement.appendChild(timeElement);
+
+            // Add deviations if any
+            if (departure.deviations && departure.deviations.length > 0) {
+              const deviationElement = document.createElement('div');
+              deviationElement.className = 'deviation';
+              deviationElement.textContent = departure.deviations.join(', ');
+              departureElement.appendChild(deviationElement);
+            }
+
+            directionGroup.appendChild(departureElement);
+          });
+
+          departuresContainer.appendChild(directionGroup);
+        }
+      }
+    }
+
+    // Instantiate the class and pass the API URL
+    const apiUrl = 'https://transport.integration.sl.se/v1/sites/9261/departures?transport=METRO&line=14&forecast=90';
+    const slDepartures = new SLDepartures(apiUrl);
+    slDepartures.fetchDepartures();
+  </script>
+</body>
+</html>
