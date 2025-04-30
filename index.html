@@ -212,32 +212,35 @@
                 const refreshButton = document.getElementById('refresh');
                 headerElement.textContent = this._stopPointName;
                 
+                // Declare color variable in the outer scope so it's accessible throughout the method
+                let color;
+                
                 // Apply color styling to header and refresh button if we have line info
                 if (lineGroupName) {
                     const lineColorHelper = new LineColorHelper();
-                    const color = lineColorHelper.getColorForLine(lineGroupName);
+                    color = lineColorHelper.getColorForLine(lineGroupName);
                 } else {
-                    const color = '#777777'; // Default color if no line group is found
+                    color = '#777777'; // Default color if no line group is found
                 }
-                    // Style the header
-                    headerElement.style.backgroundColor = color;
-                    headerElement.style.borderLeft = `4px solid ${color}`;
-                    
-                    // Style the refresh button
-                    refreshButton.style.backgroundColor = color;
-                    
-                    // Update hover effect in CSS
-                    const style = document.createElement('style');
-                    style.textContent = `
-                        .header:hover {
-                            background-color: ${color}dd !important;
-                        }
-                        .refresh-button:hover {
-                            background-color: ${color}dd !important;
-                        }
-                    `;
-                    document.head.appendChild(style);
                 
+                // Style the header
+                headerElement.style.backgroundColor = color;
+                headerElement.style.borderLeft = `4px solid ${color}`;
+                
+                // Style the refresh button
+                refreshButton.style.backgroundColor = color;
+                
+                // Update hover effect in CSS
+                const style = document.createElement('style');
+                style.textContent = `
+                    .header:hover {
+                        background-color: ${color}dd !important;
+                    }
+                    .refresh-button:hover {
+                        background-color: ${color}dd !important;
+                    }
+                `;
+                document.head.appendChild(style);
             }
 
             renderDepartures(groupedDepartures) {
