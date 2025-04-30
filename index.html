@@ -181,7 +181,12 @@
                     const data = await response.json();
 
                     this._stopPointName = data.departures[0]?.stop_area?.name || 'Unknown Stop';
-                    this.renderHeader();
+                    
+                    // Get the line group from the first departure
+                    const lineGroupName = data.departures[0]?.line?.group_of_lines;
+                    
+                    // Pass the line group to renderHeader
+                    this.renderHeader(lineGroupName);
 
                     const groupedDepartures = this.groupByDirectionCode(data.departures);
                     this.renderDepartures(groupedDepartures);
@@ -202,9 +207,35 @@
                 }, {});
             }
 
-            renderHeader() {
+            renderHeader(lineGroupName) {
                 const headerElement = document.getElementById('header');
+                const refreshButton = document.getElementById('refresh');
                 headerElement.textContent = this._stopPointName;
+                
+                // Apply color styling to header and refresh button if we have line info
+                if (lineGroupName) {
+                    const lineColorHelper = new LineColorHelper();
+                    const color = lineColorHelper.getColorForLine(lineGroupName);
+                    
+                    // Style the header
+                    headerElement.style.backgroundColor = color;
+                    headerElement.style.borderLeft = `4px solid ${color}`;
+                    
+                    // Style the refresh button
+                    refreshButton.style.backgroundColor = color;
+                    
+                    // Update hover effect in CSS
+                    const style = document.createElement('style');
+                    style.textContent = `
+                        .header:hover {
+                            background-color: ${color}dd !important;
+                        }
+                        .refresh-button:hover {
+                            background-color: ${color}dd !important;
+                        }
+                    `;
+                    document.head.appendChild(style);
+                }
             }
 
             renderDepartures(groupedDepartures) {
