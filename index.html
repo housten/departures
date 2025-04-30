@@ -132,7 +132,7 @@
             }
 
             getColorForLine(groupOfLines) {
-                if (!groupOfLines) return '#ffffff'; // Default gray
+                if (!groupOfLines) return '#777777'; // Default gray
 
                 const lowerCaseGroup = groupOfLines.toLowerCase();
 
@@ -143,7 +143,7 @@
                     }
                 }
 
-                return '#ffffff'; // Default gray if no match
+                return '#777777'; // Default gray if no match
             }
             getStationStyles(groupOfLines) {
                 const color = this.getColorForLine(groupOfLines);
