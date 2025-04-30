@@ -215,12 +215,16 @@
     // Instantiate the class and pass the API URL
     const params = new URLSearchParams(window.location.search);
     const siteNumber = params.get('site') ?? '9261'; // default to 9261 if not provided
+    const transport = params.get('transport') ?? 'METRO';
+    const line = params.get('line') ?? '14';
+    const forecast = params.get('forecast') ?? '90';
 
-    const apiUrl = `https://transport.integration.sl.se/v1/sites/${siteNumber}/departures?transport=METRO&line=14&forecast=90`;
+    const apiUrl = `https://transport.integration.sl.se/v1/sites/${siteNumber}/departures?transport=${transport}&forecast=90`;
 
     // Reuse the same SLDepartures class
     const slDepartures = new SLDepartures(apiUrl);
     slDepartures.fetchDepartures();
+
   </script>
 </body>
 </html>
