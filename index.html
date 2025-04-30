@@ -132,7 +132,7 @@
             }
 
             getColorForLine(groupOfLines) {
-                if (!groupOfLines) return '#777777'; // Default gray
+                if (!groupOfLines) return '#ffffff'; // Default white
 
                 const lowerCaseGroup = groupOfLines.toLowerCase();
 
@@ -143,7 +143,7 @@
                     }
                 }
 
-                return '#777777'; // Default gray if no match
+                return '#ffffff'; // Default white if no match
             }
             getStationStyles(groupOfLines) {
                 const color = this.getColorForLine(groupOfLines);
@@ -213,10 +213,12 @@
                 headerElement.textContent = this._stopPointName;
                 
                 // Apply color styling to header and refresh button if we have line info
-                //if (lineGroupName) {
+                if (lineGroupName) {
                     const lineColorHelper = new LineColorHelper();
                     const color = lineColorHelper.getColorForLine(lineGroupName);
-                    
+                } else {
+                    const color = '#777777'; // Default color if no line group is found
+                }
                     // Style the header
                     headerElement.style.backgroundColor = color;
                     headerElement.style.borderLeft = `4px solid ${color}`;
@@ -235,7 +237,7 @@
                         }
                     `;
                     document.head.appendChild(style);
-                // }
+                
             }
 
             renderDepartures(groupedDepartures) {
@@ -263,11 +265,11 @@
                         
                         // Get the line group and apply styling
                         const groupOfLines = departure.line?.group_of_lines;
-                        if (groupOfLines) {
+                        //if (groupOfLines) {
                             const styles = lineColorHelper.getStationStyles(groupOfLines);
                             departureElement.style.borderLeft = styles.borderLeft;
-                            departureElement.style.backgroundColor = styles.backgroundColor;
-                        }
+                            //departureElement.style.backgroundColor = styles.backgroundColor;
+                        //}
               
                         // Rest of your code for rendering departures
                         const destinationElement = document.createElement('div');
