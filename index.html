@@ -213,7 +213,7 @@
                 headerElement.textContent = this._stopPointName;
                 
                 // Apply color styling to header and refresh button if we have line info
-                if (lineGroupName) {
+                //if (lineGroupName) {
                     const lineColorHelper = new LineColorHelper();
                     const color = lineColorHelper.getColorForLine(lineGroupName);
                     
@@ -235,7 +235,7 @@
                         }
                     `;
                     document.head.appendChild(style);
-                }
+                // }
             }
 
             renderDepartures(groupedDepartures) {
