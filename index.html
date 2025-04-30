@@ -125,13 +125,14 @@
                 this._colorMap = new Map([
                     ['röda', '#E4002B'],     // Red line
                     ['gröna', '#008C45'],    // Green line
-                    ['blå', '#0075BF'],      // Blue line
-                    ['pendeltåg', '#C0C0C0'] // Commuter train (silver)
+                    ['blå', '#007db8'],      // Blue line
+                    ['pendeltåg', '#cc417f'] // Commuter train (hot pink)
+                    ['bus', '#ffffff']     // Bus (white) 
                 ]);
             }
 
             getColorForLine(groupOfLines) {
-                if (!groupOfLines) return '#888888'; // Default gray
+                if (!groupOfLines) return '#ffffff'; // Default gray
 
                 const lowerCaseGroup = groupOfLines.toLowerCase();
 
@@ -142,9 +143,8 @@
                     }
                 }
 
-                return '#888888'; // Default gray if no match
+                return '#ffffff'; // Default gray if no match
             }
-
             getStationStyles(groupOfLines) {
                 const color = this.getColorForLine(groupOfLines);
 
